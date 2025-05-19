@@ -18,6 +18,12 @@ public class TicketSoporte {
 
     private String asunto;
     private String descripcion;
-    private String estado;
+    public enum EstadoTicket {
+        ABIERTO,
+        EN_PROGRESO,
+        CERRADO
+    }
+    @Enumerated(EnumType.STRING)
+    private EstadoTicket estado;
     private LocalDate fechaCreacion;
 }

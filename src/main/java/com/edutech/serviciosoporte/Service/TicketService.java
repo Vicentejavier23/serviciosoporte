@@ -20,15 +20,31 @@ public class TicketService {
         return repo.findAll();
     }
 
-    public TicketSoporte crear(TicketSoporte ticket) {
-        ticket.setFechaCreacion(LocalDate.now());
-        ticket.setEstado("ABIERTO");
+    public TicketSoporte actualizarEstado(Long id, String nuevoEstado) {
+        TicketSoporte ticket = repo.findById(id).orElseThrow(
+                () -> new RuntimeException("Ticket no encontrado con ID: " + id));
+        ticket.setEstado(validarEstado(nuevoEstado));
         return repo.save(ticket);
     }
 
-    public TicketSoporte actualizarEstado(Long id, String nuevoEstado) {
-        TicketSoporte ticket = repo.findById(id).orElseThrow();
-        ticket.setEstado(nuevoEstado);
+    public TicketSoporte crear(TicketSoporte ticket, String estado) {
+        ticket.setFechaCreacion(LocalDate.now());
+        ticket.setEstado(validarEstado(estado));
         return repo.save(ticket);
     }
+
+    public TicketSoporte.EstadoTicket validarEstado(String estado) {
+        String estadoNormalizado = estado.trim().toUpperCase()
+                .replace(" ", "_")
+                .replace("Í", "I");
+
+        return switch (estadoNormalizado) {
+            case "CERRADO", "FINALIZADO" -> TicketSoporte.EstadoTicket.CERRADO;
+            case "EN_REVISION", "EN_PROGRESO", "REVISION" -> TicketSoporte.EstadoTicket.EN_PROGRESO;
+            default -> TicketSoporte.EstadoTicket.ABIERTO;
+        };
+    }
 }
+
+
+

@@ -1,14 +1,14 @@
 package com.edutech.serviciosoporte.Controller;
 
-
 import com.edutech.serviciosoporte.Model.TicketSoporte;
 import com.edutech.serviciosoporte.Service.TicketService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/tickets")
+@RequestMapping("/api/v1/tickets")
 public class TicketController {
 
     private final TicketService servicio;
@@ -22,13 +22,23 @@ public class TicketController {
         return servicio.listar();
     }
 
-    @PostMapping
-    public TicketSoporte crear(@RequestBody TicketSoporte ticket) {
-        return servicio.crear(ticket);
-    }
-
     @PutMapping("/{id}/estado")
-    public TicketSoporte actualizarEstado(@PathVariable Long id, @RequestParam String estado) {
+    public TicketSoporte actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        String estado = request.get("estado");
         return servicio.actualizarEstado(id, estado);
     }
+
+    @PostMapping
+    public TicketSoporte crear(@RequestBody Map<String, Object> requestBody) {
+        TicketSoporte ticket = new TicketSoporte();
+        ticket.setAsunto((String) requestBody.get("asunto"));
+        ticket.setDescripcion((String) requestBody.get("descripcion"));
+
+        String estado = (String) requestBody.get("estado");
+        return servicio.crear(ticket, estado);
+    }
 }
+
+
+
+
